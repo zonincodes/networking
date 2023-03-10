@@ -20,7 +20,7 @@ void server_start(){
     //  binding a socket
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(1234);
+    addr.sin_port = htons(12349);
     addr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
