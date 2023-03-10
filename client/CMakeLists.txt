@@ -1,0 +1,1 @@
+add_library(client client.h client.cpp)
