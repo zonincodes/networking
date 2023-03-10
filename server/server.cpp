@@ -17,5 +17,17 @@ void server_start(){
         perror("Error creating socket");
         exit(EXIT_FAILURE);
     }
+
+    //  binding a socket
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(12345);
+    addr.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    {
+        perror("Error binding socket");
+        exit(EXIT_FAILURE);
+    }
 }
 
