@@ -29,5 +29,44 @@ void server_start(){
         perror("Error binding socket");
         exit(EXIT_FAILURE);
     }
+
+    // listen to incoming connection
+    if(listen(sockfd, 5) < 0){
+        perror("Error listening for connection");
+        exit(EXIT_FAILURE);
+    }
+
+    // 
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    int clientfd = accept(sockfd, (struct sockaddr *)&client_addr, &client_len);
+
+    if(clientfd < 0){
+        perror("Error accepting connection");
+        exit(EXIT_FAILURE);
+    }
+
+    // sending and receiving data
+    char buffer[1024];
+    int num_bytes = recv(clientfd, buffer, sizeof(buffer), 0);
+    if(num_bytes < 0){
+        perror("Error receiving data");
+        exit(EXIT_FAILURE);
+    }
+
+    std::cout << "Received message: " << buffer << std::endl;
+
+    const char  *msg = "Hello from server";
+    num_bytes = send(clientfd, msg, strlen(msg), 0);
+
+    if (num_bytes < 0){
+        perror("Error sending data");
+        exit(EXIT_FAILURE);
+    }
+
+    close(clientfd);
+    close(sockfd);
+
+
 }
 
