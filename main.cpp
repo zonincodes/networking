@@ -1,5 +1,7 @@
 #include <iostream>
+#include <server.h>
+
 
 int main(int arg, char const *argv[]){
-    std::cout << "Hello World!" << std::endl; 
+    server_start();
 }
