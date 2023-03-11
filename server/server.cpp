@@ -11,7 +11,6 @@
 #include <iostream>
 #include "server.h"
 
-
 #define TRUE 1
 #define FALSE 0
 #define PORT 8888
@@ -121,25 +120,55 @@ void server_start()
                 perror("Accept");
                 exit(EXIT_FAILURE);
             }
-        }
 
-        std::cout << "New_connection, socked fd is " << new_sockect << " ip is : " << inet_ntoa(address.sin_addr) << " port : " << ntohs(address.sin_port) << std::endl;
+            std::cout << "New_connection, socked fd is " << new_sockect << " ip is : " << inet_ntoa(address.sin_addr) << " port : " << ntohs(address.sin_port) << std::endl;
 
-        if (send(new_sockect, message, strlen(message), 0) != strlen(message))
-        {
-            perror("send");
-        }
-
-        std::cout << "Message sent succssfully" << std::endl;
-
-        for (i = 0; i < max_clients; i++)
-        {
-
-            if (client_socket[i] == 0)
+            if (send(new_sockect, message, strlen(message), 0) != strlen(message))
             {
-                client_socket[i] = new_sockect;
-                std::cout << "Adding to list of sockets as " << i << std::endl;
-                break;
+                perror("send");
+            }
+
+            std::cout << "Message sent succssfully" << std::endl;
+
+            for (i = 0; i < max_clients; i++)
+            {
+
+                if (client_socket[i] == 0)
+                {
+                    client_socket[i] = new_sockect;
+                    std::cout << "Adding to list of sockets as " << i << std::endl;
+                    break;
+                }
+            }
+        }
+
+        // else its some IO operation on some other socket
+
+        for (i = 0; i < max_clients; i++){
+            sd = client_socket[i];
+
+            if(FD_ISSET(sd, &readfds))
+            {
+                // check if it was for closing and also read the \incoming message
+
+                if ((valread = read(sd, buffer, 1024)) == 0)
+                {
+                    getpeername(sd, (struct sockaddr*)&address, (socklen_t *)&addrlen);
+
+                    printf("Host disconnnected, ip %s, port %d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+
+                    //  Close the socket and mark as 0 in list for reuse
+                    close(sd);
+                    client_socket[i] = 0;
+                } 
+                // Echo back the message that came in
+                else
+                {
+                    // set the sting terminating NULL byte on the end
+                    //  of the data read
+                    buffer[valread] = '\0';
+                    send(sd, buffer, strlen(buffer), 0);
+                }
             }
         }
     }
