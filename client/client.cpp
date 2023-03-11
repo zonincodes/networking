@@ -8,6 +8,7 @@
 #include "client.h"
 #include <iostream>
 
+
 #define PORT 8888
 
 void start_client()
@@ -33,26 +34,36 @@ void start_client()
         exit(EXIT_FAILURE);
     }
 
-    // send and receive data
-    const char *msg = "HelLo world";
-
-    int num_bytes = send(sockfd, msg, strlen(msg), 0);
-
-    if (num_bytes < 0)
+    bool cond = true;
+    while (cond)
     {
-        perror("Error sending data");
-        exit(EXIT_FAILURE);
-    }
+        // send and receive data
 
-    char buffer[1024];
-    num_bytes = recv(sockfd, buffer, sizeof(buffer), 0);
-    if (num_bytes < 0)
-    {
-        perror("Error receiving data");
-        exit(EXIT_FAILURE);
-    }
+        char msg[1024];
+        const char *off = "off"; 
+        std::cin.getline(msg, sizeof(msg));
 
-    std::cout << buffer << std::endl;
+        if(msg == off){
+            cond = false;
+        }
+        int num_bytes = send(sockfd, msg, strlen(msg), 0);
+
+        if (num_bytes < 0)
+        {
+            perror("Error sending data");
+            exit(EXIT_FAILURE);
+        }
+
+        char buffer[1024];
+        num_bytes = recv(sockfd, buffer, sizeof(buffer), 0);
+        if (num_bytes < 0)
+        {
+            perror("Error receiving data");
+            exit(EXIT_FAILURE);
+        }
+
+        std::cout << buffer << std::endl;
+    }
 
     close(sockfd);
 }
